@@ -1,0 +1,4 @@
+name: BlackMarket
+version: '1.0-SNAPSHOT'
+main: net.pulsir.blackMarket.BlackMarket
+api-version: '1.21'
