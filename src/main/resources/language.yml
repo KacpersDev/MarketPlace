@@ -1,0 +1,6 @@
+no-permissions: "&cNo Permissions"
+
+item-null: "&cYou must hold an item in your hand to execute this command."
+
+sell-added: "&aSuccessfully added item to marketplace."
+sell-usage: "&cUsage /sell <price>"
