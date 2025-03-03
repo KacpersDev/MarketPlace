@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.pulsir.blackMarket.command.MarketPlaceCommand;
 import net.pulsir.blackMarket.command.SellCommand;
 import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
+import net.pulsir.blackMarket.listener.MarketPlaceListener;
 import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
 import net.pulsir.blackMarket.marketplace.manager.MarketPlaceManager;
 import net.pulsir.blackMarket.mongo.MongoManager;
@@ -70,6 +71,7 @@ public final class BlackMarket extends JavaPlugin {
 
             if (currentIndex >= slots - 1) {
                 currentPage += 1;
+                currentIndex = 0;
             }
         }
     }
@@ -97,6 +99,6 @@ public final class BlackMarket extends JavaPlugin {
     }
 
     private void loadListeners(PluginManager pluginManager) {
-
+        pluginManager.registerEvents(new MarketPlaceListener(), this);
     }
 }

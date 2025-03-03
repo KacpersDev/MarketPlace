@@ -1,9 +1,9 @@
-mongo-uri: ""
+mongo-uri: "mongodb://88.209.197.187:45782/"
 
 marketplace-inventory:
   title: "&aMarketPlace"
   size: 54
-  market-slots: [1,2,3,4,5]
+  market-slots: [0,1,2,3,4,5,6,7,8,9]
 
 next:
   item: "ARROW"

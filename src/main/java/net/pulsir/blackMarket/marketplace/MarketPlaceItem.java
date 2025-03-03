@@ -27,6 +27,7 @@ public class MarketPlaceItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING, seller.toString());
         itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE, price);
+        itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getMarketPlaceInventory().buttonEvent(), PersistentDataType.STRING, "purchase");
         marketIem.setItemMeta(itemMeta);
         return marketIem;
     }

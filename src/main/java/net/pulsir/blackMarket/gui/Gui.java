@@ -2,12 +2,11 @@ package net.pulsir.blackMarket.gui;
 
 import net.kyori.adventure.text.Component;
 import net.pulsir.blackMarket.BlackMarket;
-import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.eclipse.sisu.space.BundleClassSpace;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +20,11 @@ public interface Gui {
     ItemStack previousPage();
     Component title();
     int size();
+    NamespacedKey buttonEvent();
 
     default void open(Player player) {
         Inventory inventory = Bukkit.createInventory(player, size(), title());
+
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
                 .getConfiguration().getInt("next.slot"), nextPage());
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
@@ -38,6 +39,56 @@ public interface Gui {
             currentItem++;
         }
 
+        playerPages().put(player.getUniqueId(), 0);
         player.openInventory(inventory);
+    }
+
+    default void updateInventory(Player player, boolean add) {
+        int currentPage = playerPages().get(player.getUniqueId());
+        if (add) {
+            if (pageContent().get(currentPage + 1) != null) {
+                playerPages().replace(player.getUniqueId(), currentPage + 1);
+
+                Inventory inventory = player.getOpenInventory().getTopInventory();
+                inventory.clear();
+
+                inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                        .getConfiguration().getInt("next.slot"), nextPage());
+                inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                        .getConfiguration().getInt("previous.slot"), previousPage());
+
+                List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+                int currentItem = 0;
+
+                for (ItemStack itemStack : pageContent().get(currentPage + 1)) {
+                    inventory.setItem(slots.get(currentItem), itemStack);
+
+                    currentItem++;
+                }
+            }
+        } else {
+            if (pageContent().get(currentPage - 1) != null) {
+                playerPages().replace(player.getUniqueId(), currentPage - 1);
+                Inventory inventory = player.getOpenInventory().getTopInventory();
+                inventory.clear();
+
+                inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                        .getConfiguration().getInt("next.slot"), nextPage());
+                inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                        .getConfiguration().getInt("previous.slot"), previousPage());
+
+                List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+                int currentItem = 0;
+
+                for (ItemStack itemStack : pageContent().get(currentPage - 1)) {
+                    inventory.setItem(slots.get(currentItem), itemStack);
+
+                    currentItem++;
+                }
+            }
+        }
+
+        Bukkit.getConsoleSender().sendMessage(String.valueOf(playerPages().get(player.getUniqueId())));
+        player.updateInventory();
     }
 }

@@ -7,8 +7,10 @@ import com.mongodb.client.model.ReplaceOptions;
 import lombok.Getter;
 import net.pulsir.blackMarket.BlackMarket;
 import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
+import net.pulsir.blackMarket.utils.color.Color;
 import net.pulsir.blackMarket.utils.serializer.ItemStackSerializer;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -35,6 +37,7 @@ public class MarketPlaceManager {
     }
 
     public void save() {
+        Bukkit.getConsoleSender().sendMessage(Color.translate("&aSaving " + marketPlaceItems.values().size() + " market place items..."));
         marketPlaceItems.values().forEach(marketPlaceItem -> {
             Document document = new Document();
             document.put("itemId", marketPlaceItem.getItemId().toString());
