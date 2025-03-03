@@ -1,1 +1,15 @@
 mongo-uri: ""
+
+marketplace-inventory:
+  title: ""
+  size: 54
+  market-slots: [1,2,3,4,5]
+
+next:
+  item: "ARROW"
+  name: "&aNext Page"
+  slot: 53
+previous:
+  item: "ARROW"
+  name: "&cPrevious Page"
+  slot: 45

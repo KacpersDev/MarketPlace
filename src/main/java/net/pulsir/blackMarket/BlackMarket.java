@@ -2,11 +2,15 @@ package net.pulsir.blackMarket;
 
 import lombok.Getter;
 import net.pulsir.blackMarket.command.SellCommand;
+import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
+import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
 import net.pulsir.blackMarket.marketplace.manager.MarketPlaceManager;
 import net.pulsir.blackMarket.mongo.MongoManager;
 import net.pulsir.blackMarket.utils.config.Config;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,10 +22,15 @@ public final class BlackMarket extends JavaPlugin {
 
     @Getter private static BlackMarket instance;
 
+    private final NamespacedKey seller = new NamespacedKey(this, "seller");
+    private final NamespacedKey price = new NamespacedKey(this, "price");
+
     private Config configuration, language;
 
     private MongoManager mongoManager;
     private MarketPlaceManager marketPlaceManager;
+
+    private MarketPlaceInventory marketPlaceInventory;
 
     @Override
     public void onEnable() {
@@ -35,6 +44,25 @@ public final class BlackMarket extends JavaPlugin {
 
         this.marketPlaceManager = new MarketPlaceManager();
         this.marketPlaceManager.load();
+
+        this.marketPlaceInventory = new MarketPlaceInventory();
+
+
+        int slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots").size();
+        int currentIndex = 0;
+        int currentPage = 0;
+
+        ItemStack[] items = new ItemStack[marketPlaceInventory.size()];
+        for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().values()) {
+            ItemStack item = marketPlaceItem.toItem();
+
+
+            currentIndex++;
+
+            if (currentPage >= slots - 1) {
+                currentPage += 1;
+            }
+        }
     }
 
     @Override

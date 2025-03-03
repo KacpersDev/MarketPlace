@@ -23,7 +23,7 @@ public class MarketPlaceCommand implements CommandExecutor {
             return false;
         }
 
-
+        BlackMarket.getInstance().getMarketPlaceInventory().open(player);
 
         return true;
     }
