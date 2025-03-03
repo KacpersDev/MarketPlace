@@ -4,3 +4,4 @@ main: net.pulsir.blackMarket.BlackMarket
 api-version: '1.21'
 commands:
   sell:
+  marketplace:

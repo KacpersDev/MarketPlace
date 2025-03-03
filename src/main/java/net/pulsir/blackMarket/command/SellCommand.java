@@ -40,10 +40,14 @@ public class SellCommand implements CommandExecutor {
                 double price = Double.parseDouble(args[0]);
                 UUID itemId = UUID.randomUUID();
 
+                MarketPlaceItem marketPlaceItem = new MarketPlaceItem(itemId, player.getUniqueId(),
+                        itemStack, price);
                 BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems()
-                        .put(itemId, new MarketPlaceItem(itemId, player.getUniqueId(), itemStack, price));
+                        .put(itemId, marketPlaceItem);
                 player.sendMessage(Color.translate(Objects.requireNonNull(BlackMarket.getInstance()
                         .getLanguage().getConfiguration().getString("sell-added"))));
+
+                BlackMarket.getInstance().getMarketPlaceManager().addItem(marketPlaceItem);
             } catch (NumberFormatException e) {
                 player.sendMessage(Color.translate("&cArgument must be a number."));
                 e.printStackTrace();

@@ -9,27 +9,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.sisu.space.BundleClassSpace;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public interface Gui {
 
     Map<UUID, Integer> playerPages();
-    Map<Integer, ItemStack[]> pageContent();
+    Map<Integer, List<ItemStack>> pageContent();
     ItemStack nextPage();
     ItemStack previousPage();
     Component title();
     int size();
-
-    default void load(int page) {
-        int slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots").size();
-
-        for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().values()) {
-            ItemStack itemStack = marketPlaceItem.toItem();
-
-
-        }
-    }
 
     default void open(Player player) {
         Inventory inventory = Bukkit.createInventory(player, size(), title());
@@ -38,7 +29,14 @@ public interface Gui {
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
                 .getConfiguration().getInt("previous.slot"), previousPage());
 
+        List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+        int currentItem = 0;
 
+        for (ItemStack itemStack : pageContent().get(0)) {
+            inventory.setItem(slots.get(currentItem), itemStack);
+
+            currentItem++;
+        }
 
         player.openInventory(inventory);
     }

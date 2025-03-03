@@ -8,15 +8,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class MarketPlaceInventory implements Gui {
 
     private final Map<UUID, Integer> playerPages = new HashMap<>();
-    private final Map<Integer, ItemStack[]> pageContent = new HashMap<>();
+    private final Map<Integer, List<ItemStack>> pageContent = new HashMap<>();
 
     @Override
     public Map<UUID, Integer> playerPages() {
@@ -24,7 +21,7 @@ public class MarketPlaceInventory implements Gui {
     }
 
     @Override
-    public Map<Integer, ItemStack[]> pageContent() {
+    public Map<Integer, List<ItemStack>> pageContent() {
         return pageContent;
     }
 
@@ -63,6 +60,4 @@ public class MarketPlaceInventory implements Gui {
         return BlackMarket.getInstance().getConfiguration()
                 .getConfiguration().getInt("marketplace-inventory.size");
     }
-
-
 }

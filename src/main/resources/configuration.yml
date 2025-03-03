@@ -1,7 +1,7 @@
 mongo-uri: ""
 
 marketplace-inventory:
-  title: ""
+  title: "&aMarketPlace"
   size: 54
   market-slots: [1,2,3,4,5]
 

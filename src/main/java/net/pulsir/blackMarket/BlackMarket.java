@@ -1,6 +1,7 @@
 package net.pulsir.blackMarket;
 
 import lombok.Getter;
+import net.pulsir.blackMarket.command.MarketPlaceCommand;
 import net.pulsir.blackMarket.command.SellCommand;
 import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
 import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
@@ -15,6 +16,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -52,14 +55,20 @@ public final class BlackMarket extends JavaPlugin {
         int currentIndex = 0;
         int currentPage = 0;
 
-        ItemStack[] items = new ItemStack[marketPlaceInventory.size()];
         for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().values()) {
             ItemStack item = marketPlaceItem.toItem();
 
+            if (getMarketPlaceInventory().pageContent().containsKey(currentPage)) {
+                getMarketPlaceInventory().pageContent().get(currentPage).add(item);
+            } else {
+                List<ItemStack> items = new ArrayList<>();
+                items.add(item);
+                getMarketPlaceInventory().pageContent().put(currentPage, items);
+            }
 
             currentIndex++;
 
-            if (currentPage >= slots - 1) {
+            if (currentIndex >= slots - 1) {
                 currentPage += 1;
             }
         }
@@ -84,6 +93,7 @@ public final class BlackMarket extends JavaPlugin {
 
     private void loadCommand() {
         Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand());
+        Objects.requireNonNull(getCommand("marketplace")).setExecutor(new MarketPlaceCommand());
     }
 
     private void loadListeners(PluginManager pluginManager) {
