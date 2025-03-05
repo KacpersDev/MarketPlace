@@ -20,7 +20,7 @@ public class SellCommand implements CommandExecutor {
 
         if (!(sender instanceof Player player)) return false;
 
-        if (!player.hasPermission(" marketplace.sell")) {
+        if (!player.hasPermission(Objects.requireNonNull(BlackMarket.getInstance().getConfiguration().getConfiguration().getString("permissions.marketplace-sell")))) {
             player.sendMessage(Color.translate(Objects.requireNonNull(BlackMarket.getInstance()
                     .getLanguage().getConfiguration().getString("no-permissions"))));
             return false;

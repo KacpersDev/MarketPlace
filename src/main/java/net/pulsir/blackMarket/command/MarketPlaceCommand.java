@@ -1,6 +1,7 @@
 package net.pulsir.blackMarket.command;
 
 import net.pulsir.blackMarket.BlackMarket;
+import net.pulsir.blackMarket.gui.GuiType;
 import net.pulsir.blackMarket.utils.color.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,13 +18,13 @@ public class MarketPlaceCommand implements CommandExecutor {
 
         if (!(sender instanceof Player player)) return false;
 
-        if (!player.hasPermission("marketplace.view")) {
+        if (!player.hasPermission(Objects.requireNonNull(BlackMarket.getInstance().getConfiguration().getConfiguration().getString("permissions.marketplace-view")))) {
             player.sendMessage(Color.translate(Objects.requireNonNull(BlackMarket.getInstance()
                     .getLanguage().getConfiguration().getString("no-permissions"))));
             return false;
         }
 
-        BlackMarket.getInstance().getMarketPlaceInventory().open(player);
+        BlackMarket.getInstance().getMarketPlaceInventory().open(player, GuiType.MARKETPLACE);
 
         return true;
     }

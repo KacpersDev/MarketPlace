@@ -1,13 +1,18 @@
 package net.pulsir.blackMarket;
 
 import lombok.Getter;
+import net.pulsir.blackMarket.command.BlackMarketCommand;
 import net.pulsir.blackMarket.command.MarketPlaceCommand;
 import net.pulsir.blackMarket.command.SellCommand;
+import net.pulsir.blackMarket.gui.impl.BlackMarketInventory;
 import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
 import net.pulsir.blackMarket.listener.MarketPlaceListener;
 import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
+import net.pulsir.blackMarket.marketplace.MarketPlaceType;
+import net.pulsir.blackMarket.marketplace.manager.BlackMarketManager;
 import net.pulsir.blackMarket.marketplace.manager.MarketPlaceManager;
 import net.pulsir.blackMarket.mongo.MongoManager;
+import net.pulsir.blackMarket.task.BlackMarketTask;
 import net.pulsir.blackMarket.utils.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -33,8 +38,10 @@ public final class BlackMarket extends JavaPlugin {
 
     private MongoManager mongoManager;
     private MarketPlaceManager marketPlaceManager;
+    private BlackMarketManager blackMarketManager;
 
     private MarketPlaceInventory marketPlaceInventory;
+    private BlackMarketInventory blackMarketInventory;
 
     @Override
     public void onEnable() {
@@ -47,38 +54,36 @@ public final class BlackMarket extends JavaPlugin {
         this.mongoManager = new MongoManager();
 
         this.marketPlaceManager = new MarketPlaceManager();
+        this.blackMarketManager = new BlackMarketManager();
+
         this.marketPlaceManager.load();
+        this.blackMarketManager.load();
 
         this.marketPlaceInventory = new MarketPlaceInventory();
+        this.blackMarketInventory = new BlackMarketInventory();
 
-
-        int slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots").size();
-        int currentIndex = 0;
-        int currentPage = 0;
-
-        for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().values()) {
-            ItemStack item = marketPlaceItem.toItem();
-
-            if (getMarketPlaceInventory().pageContent().containsKey(currentPage)) {
-                getMarketPlaceInventory().pageContent().get(currentPage).add(item);
-            } else {
-                List<ItemStack> items = new ArrayList<>();
-                items.add(item);
-                getMarketPlaceInventory().pageContent().put(currentPage, items);
-            }
-
-            currentIndex++;
-
-            if (currentIndex >= slots - 1) {
-                currentPage += 1;
-                currentIndex = 0;
-            }
+        if (getBlackMarketManager().getBlackMarketItems().values().isEmpty()) {
+            getBlackMarketManager().set();
         }
+
+        if (getConfiguration().getConfiguration().getLong("blackmarket-reset") != 0) {
+            getBlackMarketManager().setCurrentTime(getConfiguration().getConfiguration()
+                    .getLong("blackmarket-reset"));
+        }
+
+        this.loadMarket(MarketPlaceType.DEFAULT);
+        this.loadMarket(MarketPlaceType.BLACK_MARKET);
+
+        Bukkit.getScheduler().runTaskTimer(this, new BlackMarketTask(), 0L, 20L);
     }
 
     @Override
     public void onDisable() {
         this.marketPlaceManager.save();
+        this.blackMarketManager.save();
+
+        getConfiguration().getConfiguration().set("blackmarket-reset",
+                getBlackMarketManager().getCurrentTime());
 
         instance = null;
     }
@@ -96,9 +101,60 @@ public final class BlackMarket extends JavaPlugin {
     private void loadCommand() {
         Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand());
         Objects.requireNonNull(getCommand("marketplace")).setExecutor(new MarketPlaceCommand());
+        Objects.requireNonNull(getCommand("blackmarket")).setExecutor(new BlackMarketCommand());
     }
 
     private void loadListeners(PluginManager pluginManager) {
         pluginManager.registerEvents(new MarketPlaceListener(), this);
+    }
+
+    private void loadMarket(MarketPlaceType marketPlaceType) {
+        if (marketPlaceType.equals(MarketPlaceType.DEFAULT)) {
+            int slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots").size();
+            int currentIndex = 0;
+            int currentPage = 0;
+
+            for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().values()) {
+                ItemStack item = marketPlaceItem.toItem();
+
+                if (getMarketPlaceInventory().pageContent().containsKey(currentPage)) {
+                    getMarketPlaceInventory().pageContent().get(currentPage).add(item);
+                } else {
+                    List<ItemStack> items = new ArrayList<>();
+                    items.add(item);
+                    getMarketPlaceInventory().pageContent().put(currentPage, items);
+                }
+
+                currentIndex++;
+
+                if (currentIndex >= slots - 1) {
+                    currentPage += 1;
+                    currentIndex = 0;
+                }
+            }
+        } else if (marketPlaceType.equals(MarketPlaceType.BLACK_MARKET)) {
+            int slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("blackmarket.slots").size();
+            int currentIndex = 0;
+            int currentPage = 0;
+
+            for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getBlackMarketManager().getBlackMarketItems().values()) {
+                ItemStack item = marketPlaceItem.toItem();
+
+                if (getBlackMarketInventory().pageContent().containsKey(currentPage)) {
+                    getBlackMarketInventory().pageContent().get(currentPage).add(item);
+                } else {
+                    List<ItemStack> items = new ArrayList<>();
+                    items.add(item);
+                    getBlackMarketInventory().pageContent().put(currentPage, items);
+                }
+
+                currentIndex++;
+
+                if (currentIndex >= slots - 1) {
+                    currentPage += 1;
+                    currentIndex = 0;
+                }
+            }
+        }
     }
 }

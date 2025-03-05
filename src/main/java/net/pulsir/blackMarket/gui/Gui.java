@@ -22,7 +22,7 @@ public interface Gui {
     int size();
     NamespacedKey buttonEvent();
 
-    default void open(Player player) {
+    default void open(Player player, GuiType type) {
         Inventory inventory = Bukkit.createInventory(player, size(), title());
 
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
@@ -30,65 +30,121 @@ public interface Gui {
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
                 .getConfiguration().getInt("previous.slot"), previousPage());
 
-        List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
-        int currentItem = 0;
+        if (type.equals(GuiType.MARKETPLACE)) {
+            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+            int currentItem = 0;
 
-        for (ItemStack itemStack : pageContent().get(0)) {
-            inventory.setItem(slots.get(currentItem), itemStack);
+            for (ItemStack itemStack : pageContent().get(0)) {
+                inventory.setItem(slots.get(currentItem), itemStack);
 
-            currentItem++;
+                currentItem++;
+            }
+        } else if (type.equals(GuiType.BLACK_MARKET)) {
+            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("blackmarket.slots");
+            int currentItem = 0;
+
+            for (ItemStack itemStack : pageContent().get(0)) {
+                inventory.setItem(slots.get(currentItem), itemStack);
+
+                currentItem++;
+            }
         }
 
         playerPages().put(player.getUniqueId(), 0);
         player.openInventory(inventory);
     }
 
-    default void updateInventory(Player player, boolean add) {
-        int currentPage = playerPages().get(player.getUniqueId());
-        if (add) {
-            if (pageContent().get(currentPage + 1) != null) {
-                playerPages().replace(player.getUniqueId(), currentPage + 1);
+    default void updateInventory(Player player, boolean add, GuiType type) {
+        if (type.equals(GuiType.MARKETPLACE)) {
+            int currentPage = playerPages().get(player.getUniqueId());
+            if (add) {
+                if (pageContent().get(currentPage + 1) != null) {
+                    playerPages().replace(player.getUniqueId(), currentPage + 1);
 
-                Inventory inventory = player.getOpenInventory().getTopInventory();
-                inventory.clear();
+                    Inventory inventory = player.getOpenInventory().getTopInventory();
+                    inventory.clear();
 
-                inventory.setItem(BlackMarket.getInstance().getConfiguration()
-                        .getConfiguration().getInt("next.slot"), nextPage());
-                inventory.setItem(BlackMarket.getInstance().getConfiguration()
-                        .getConfiguration().getInt("previous.slot"), previousPage());
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("next.slot"), nextPage());
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("previous.slot"), previousPage());
 
-                List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
-                int currentItem = 0;
+                    List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+                    int currentItem = 0;
 
-                for (ItemStack itemStack : pageContent().get(currentPage + 1)) {
-                    inventory.setItem(slots.get(currentItem), itemStack);
+                    for (ItemStack itemStack : pageContent().get(currentPage + 1)) {
+                        inventory.setItem(slots.get(currentItem), itemStack);
 
-                    currentItem++;
+                        currentItem++;
+                    }
+                }
+            } else {
+                if (pageContent().get(currentPage - 1) != null) {
+                    playerPages().replace(player.getUniqueId(), currentPage - 1);
+                    Inventory inventory = player.getOpenInventory().getTopInventory();
+                    inventory.clear();
+
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("next.slot"), nextPage());
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("previous.slot"), previousPage());
+
+                    List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+                    int currentItem = 0;
+
+                    for (ItemStack itemStack : pageContent().get(currentPage - 1)) {
+                        inventory.setItem(slots.get(currentItem), itemStack);
+
+                        currentItem++;
+                    }
                 }
             }
-        } else {
-            if (pageContent().get(currentPage - 1) != null) {
-                playerPages().replace(player.getUniqueId(), currentPage - 1);
-                Inventory inventory = player.getOpenInventory().getTopInventory();
-                inventory.clear();
+        } else if (type.equals(GuiType.BLACK_MARKET)) {
+            int currentPage = playerPages().get(player.getUniqueId());
+            if (add) {
+                if (pageContent().get(currentPage + 1) != null) {
+                    playerPages().replace(player.getUniqueId(), currentPage + 1);
 
-                inventory.setItem(BlackMarket.getInstance().getConfiguration()
-                        .getConfiguration().getInt("next.slot"), nextPage());
-                inventory.setItem(BlackMarket.getInstance().getConfiguration()
-                        .getConfiguration().getInt("previous.slot"), previousPage());
+                    Inventory inventory = player.getOpenInventory().getTopInventory();
+                    inventory.clear();
 
-                List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
-                int currentItem = 0;
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("next.slot"), nextPage());
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("previous.slot"), previousPage());
 
-                for (ItemStack itemStack : pageContent().get(currentPage - 1)) {
-                    inventory.setItem(slots.get(currentItem), itemStack);
+                    List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("blackmarket.slots");
+                    int currentItem = 0;
 
-                    currentItem++;
+                    for (ItemStack itemStack : pageContent().get(currentPage + 1)) {
+                        inventory.setItem(slots.get(currentItem), itemStack);
+
+                        currentItem++;
+                    }
+                }
+            } else {
+                if (pageContent().get(currentPage - 1) != null) {
+                    playerPages().replace(player.getUniqueId(), currentPage - 1);
+                    Inventory inventory = player.getOpenInventory().getTopInventory();
+                    inventory.clear();
+
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("next.slot"), nextPage());
+                    inventory.setItem(BlackMarket.getInstance().getConfiguration()
+                            .getConfiguration().getInt("previous.slot"), previousPage());
+
+                    List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("blackmarket.slots");
+                    int currentItem = 0;
+
+                    for (ItemStack itemStack : pageContent().get(currentPage - 1)) {
+                        inventory.setItem(slots.get(currentItem), itemStack);
+
+                        currentItem++;
+                    }
                 }
             }
         }
 
-        Bukkit.getConsoleSender().sendMessage(String.valueOf(playerPages().get(player.getUniqueId())));
         player.updateInventory();
     }
 }

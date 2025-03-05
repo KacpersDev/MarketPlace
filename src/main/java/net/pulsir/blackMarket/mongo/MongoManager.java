@@ -14,7 +14,7 @@ import java.util.Objects;
 @Getter
 public class MongoManager {
 
-    private final MongoCollection<Document> profiles, items, transactions;
+    private final MongoCollection<Document> profiles, items, transactions, blackmarket;
 
     public MongoManager() {
         MongoClient mongoClient = MongoClients.create(new ConnectionString(Objects.requireNonNull(BlackMarket.getInstance()
@@ -24,5 +24,6 @@ public class MongoManager {
         profiles = database.getCollection("profiles");
         items = database.getCollection("items");
         transactions = database.getCollection("transactions");
+        blackmarket = database.getCollection("blackmarket");
     }
 }
