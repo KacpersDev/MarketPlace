@@ -4,6 +4,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.pulsir.blackMarket.BlackMarket;
 import net.pulsir.blackMarket.gui.GuiType;
+import net.pulsir.blackMarket.transaction.Transaction;
 import net.pulsir.blackMarket.utils.color.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.UUID;
+import java.util.*;
 
 public class MarketPlaceListener implements Listener {
 
@@ -64,6 +65,15 @@ public class MarketPlaceListener implements Listener {
             player.getInventory().addItem(itemStack);
 
             BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().remove(itemId);
+
+            Transaction transaction = new Transaction(UUID.randomUUID(), player.getUniqueId(), seller, itemStack, new Date(), price);
+            if (!BlackMarket.getInstance().getTransactionManager().getTransactions().containsKey(player.getUniqueId())) {
+                List<Transaction> transactions = new ArrayList<>();
+                transactions.add(transaction);
+                BlackMarket.getInstance().getTransactionManager().getTransactions().put(player.getUniqueId(), transactions);
+            } else {
+                BlackMarket.getInstance().getTransactionManager().getTransactions().get(player.getUniqueId()).add(transaction);
+            }
 
             player.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
                     .getConfiguration().getString("purchased")));

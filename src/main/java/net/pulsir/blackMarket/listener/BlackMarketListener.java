@@ -4,6 +4,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.pulsir.blackMarket.BlackMarket;
 import net.pulsir.blackMarket.gui.GuiType;
+import net.pulsir.blackMarket.transaction.Transaction;
 import net.pulsir.blackMarket.utils.color.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +15,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class BlackMarketListener implements Listener {
@@ -60,6 +64,15 @@ public class BlackMarketListener implements Listener {
 
             BlackMarket.getEcon().withdrawPlayer(player, price);
             BlackMarket.getEcon().depositPlayer(Bukkit.getOfflinePlayer(seller), (price * 2));
+
+            Transaction transaction = new Transaction(UUID.randomUUID(), player.getUniqueId(), seller, itemStack, new Date(), price);
+            if (!BlackMarket.getInstance().getTransactionManager().getTransactions().containsKey(player.getUniqueId())) {
+                List<Transaction> transactions = new ArrayList<>();
+                transactions.add(transaction);
+                BlackMarket.getInstance().getTransactionManager().getTransactions().put(player.getUniqueId(), transactions);
+            } else {
+                BlackMarket.getInstance().getTransactionManager().getTransactions().get(player.getUniqueId()).add(transaction);
+            }
 
             player.getInventory().addItem(itemStack);
 

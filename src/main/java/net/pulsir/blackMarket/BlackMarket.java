@@ -14,6 +14,7 @@ import net.pulsir.blackMarket.marketplace.manager.BlackMarketManager;
 import net.pulsir.blackMarket.marketplace.manager.MarketPlaceManager;
 import net.pulsir.blackMarket.mongo.MongoManager;
 import net.pulsir.blackMarket.task.BlackMarketTask;
+import net.pulsir.blackMarket.transaction.manager.TransactionManager;
 import net.pulsir.blackMarket.utils.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -44,6 +45,7 @@ public final class BlackMarket extends JavaPlugin {
     private MongoManager mongoManager;
     private MarketPlaceManager marketPlaceManager;
     private BlackMarketManager blackMarketManager;
+    private TransactionManager transactionManager;
 
     private MarketPlaceInventory marketPlaceInventory;
     private BlackMarketInventory blackMarketInventory;
@@ -66,9 +68,11 @@ public final class BlackMarket extends JavaPlugin {
 
         this.marketPlaceManager = new MarketPlaceManager();
         this.blackMarketManager = new BlackMarketManager();
+        this.transactionManager = new TransactionManager();
 
         this.marketPlaceManager.load();
         this.blackMarketManager.load();
+        this.transactionManager.load();
 
         this.marketPlaceInventory = new MarketPlaceInventory();
         this.blackMarketInventory = new BlackMarketInventory();
@@ -92,6 +96,7 @@ public final class BlackMarket extends JavaPlugin {
     public void onDisable() {
         this.marketPlaceManager.save();
         this.blackMarketManager.save();
+        this.transactionManager.save();
 
         getConfiguration().getConfiguration().set("blackmarket-reset",
                 getBlackMarketManager().getCurrentTime());

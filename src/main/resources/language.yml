@@ -9,3 +9,13 @@ blackmarket-refresh: "&aSuccessfully refreshed blackmarket."
 
 insufficient-balance: "&cYou don't have enough money. You need {amount}"
 purchased: "&aSuccessfully purchased an item."
+
+transaction-usage:
+  - ""
+  - "&c/transaction <player> [limit]"
+  - ""
+
+transaction-empty-player: "&cFailed to find {player} in database."
+
+transaction-history: "&aDisplaying {amount} of {player} transactions"
+transaction-view: "&8[&c#{index}&8] &c{player} has purchased {item_name} for {price} at {date}"
