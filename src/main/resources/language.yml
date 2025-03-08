@@ -6,3 +6,6 @@ sell-added: "&aSuccessfully added item to marketplace."
 sell-usage: "&cUsage /sell <price>"
 
 blackmarket-refresh: "&aSuccessfully refreshed blackmarket."
+
+insufficient-balance: "&cYou don't have enough money. You need {amount}"
+purchased: "&aSuccessfully purchased an item."

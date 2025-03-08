@@ -4,12 +4,17 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.pulsir.blackMarket.BlackMarket;
 import net.pulsir.blackMarket.gui.GuiType;
+import net.pulsir.blackMarket.utils.color.Color;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.UUID;
 
 public class MarketPlaceListener implements Listener {
 
@@ -33,7 +38,35 @@ public class MarketPlaceListener implements Listener {
         if (buttonEvent == null) return;
 
         if (buttonEvent.equalsIgnoreCase("purchase")) {
-            // todo purchase
+            ItemStack itemStack = event.getCurrentItem();
+
+            if (!itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getSeller())
+            || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING) == null) return;
+            if (!itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getPrice())
+                    || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE) == null
+                    || !itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING)
+                    || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING) == null) return;
+
+            UUID seller = UUID.fromString(itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING));
+            UUID itemId = UUID.fromString(itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING));
+            double price = itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE);
+
+            if (!BlackMarket.getEcon().has(player, price)) {
+                player.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
+                        .getConfiguration().getString("insufficient-balance")
+                        .replace("{amount}", String.valueOf(price))));
+                return;
+            }
+
+            BlackMarket.getEcon().withdrawPlayer(player, price);
+            BlackMarket.getEcon().depositPlayer(Bukkit.getOfflinePlayer(seller), price);
+
+            player.getInventory().addItem(itemStack);
+
+            BlackMarket.getInstance().getMarketPlaceManager().getMarketPlaceItems().remove(itemId);
+
+            player.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
+                    .getConfiguration().getString("purchased")));
         } else if (buttonEvent.equalsIgnoreCase("next")) {
             BlackMarket.getInstance().getMarketPlaceInventory().updateInventory(player, true, GuiType.MARKETPLACE);
         } else if (buttonEvent.equalsIgnoreCase("previous")) {
@@ -46,3 +79,8 @@ public class MarketPlaceListener implements Listener {
         BlackMarket.getInstance().getMarketPlaceInventory().playerPages().remove(event.getPlayer().getUniqueId());
     }
 }
+/*
+        itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING, seller.toString());
+        itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE, price);
+        itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getMarketPlaceInventory().buttonEvent(), PersistentDataType.STRING, "purchase");
+ */

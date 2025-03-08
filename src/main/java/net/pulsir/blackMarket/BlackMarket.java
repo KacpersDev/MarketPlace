@@ -1,6 +1,7 @@
 package net.pulsir.blackMarket;
 
 import lombok.Getter;
+import net.milkbowl.vault.economy.Economy;
 import net.pulsir.blackMarket.command.BlackMarketCommand;
 import net.pulsir.blackMarket.command.MarketPlaceCommand;
 import net.pulsir.blackMarket.command.SellCommand;
@@ -19,6 +20,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -31,8 +33,11 @@ public final class BlackMarket extends JavaPlugin {
 
     @Getter private static BlackMarket instance;
 
+    @Getter private static Economy econ = null;
+
     private final NamespacedKey seller = new NamespacedKey(this, "seller");
     private final NamespacedKey price = new NamespacedKey(this, "price");
+    private final NamespacedKey itemId = new NamespacedKey(this, "itemId");
 
     private Config configuration, language;
 
@@ -50,6 +55,12 @@ public final class BlackMarket extends JavaPlugin {
         this.loadConfiguration();
         this.loadCommand();
         this.loadListeners(Bukkit.getPluginManager());
+
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         this.mongoManager = new MongoManager();
 
@@ -106,6 +117,18 @@ public final class BlackMarket extends JavaPlugin {
 
     private void loadListeners(PluginManager pluginManager) {
         pluginManager.registerEvents(new MarketPlaceListener(), this);
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
     private void loadMarket(MarketPlaceType marketPlaceType) {
