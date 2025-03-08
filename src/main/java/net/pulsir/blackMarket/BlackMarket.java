@@ -5,6 +5,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.pulsir.blackMarket.command.BlackMarketCommand;
 import net.pulsir.blackMarket.command.MarketPlaceCommand;
 import net.pulsir.blackMarket.command.SellCommand;
+import net.pulsir.blackMarket.command.TransactionCommand;
 import net.pulsir.blackMarket.gui.impl.BlackMarketInventory;
 import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
 import net.pulsir.blackMarket.listener.MarketPlaceListener;
@@ -118,6 +119,7 @@ public final class BlackMarket extends JavaPlugin {
         Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand());
         Objects.requireNonNull(getCommand("marketplace")).setExecutor(new MarketPlaceCommand());
         Objects.requireNonNull(getCommand("blackmarket")).setExecutor(new BlackMarketCommand());
+        getCommand("transaction").setExecutor(new TransactionCommand());
     }
 
     private void loadListeners(PluginManager pluginManager) {

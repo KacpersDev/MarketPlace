@@ -6,3 +6,4 @@ commands:
   sell:
   marketplace:
   blackmarket:
+  transaction:
