@@ -25,6 +25,10 @@ public class BlackMarketCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
+            if (BlackMarket.getInstance().getBlackMarketManager().getBlackMarketItems().values().isEmpty()) {
+                BlackMarket.getInstance().getBlackMarketManager().set();
+            }
+
             BlackMarket.getInstance().getBlackMarketInventory().open(player, GuiType.BLACK_MARKET);
         } else if (args[0].equalsIgnoreCase("refresh")) {
             if (!player.hasPermission(Objects.requireNonNull(BlackMarket.getInstance().getConfiguration().getConfiguration().getString("permissions.marketplace-blackmarket-refresh")))) {

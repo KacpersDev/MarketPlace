@@ -1,9 +1,11 @@
 mongo-uri: "mongodb://88.209.197.187:45782/"
 
+webhook: "https://discord.com/api/webhooks/1349448526949781686/gKeR-k9-hl_N_yQ7bxqty35Iiw8ZnNYc4JT8M1Dl9kE4-ep_qVpf-scM-2WZLnBb_TwB"
+
 marketplace-inventory:
   title: "&aMarketPlace"
   size: 54
-  market-slots: [0,1,2,3,4,5,6,7,8,9]
+  market-slots: [0,1,2,3,4,5,6,7,8]
 
 next:
   item: "ARROW"
@@ -18,7 +20,7 @@ blackmarket-max: 9
 blackmarket:
   title: "&dBlackMarket"
   size: 54
-  slots: [0,1,2,3,4,5,6,7,8,9]
+  slots: [0,1,2,3,4,5,6,7,8]
 
 permissions:
   marketplace-sell: "marketplace.sell"

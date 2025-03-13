@@ -59,18 +59,21 @@ public class MarketPlaceManager {
     public void addItem(MarketPlaceItem marketPlaceItem) {
         ItemStack itemStack = marketPlaceItem.toItem();
 
-        int pageSize = BlackMarket.getInstance().getMarketPlaceInventory().pageContent().keySet().size();
-        int lastPage = BlackMarket.getInstance().getMarketPlaceInventory().pageContent()
-                .keySet().stream().toList().get(pageSize - 1);
+        Map<Integer, List<ItemStack>> pageContent = BlackMarket.getInstance().getMarketPlaceInventory().pageContent();
+        int pageSize = pageContent.keySet().size();
+
+        int lastPage;
+        if (pageSize == 0) {
+            lastPage = 0;
+            pageContent.put(lastPage, new ArrayList<>());
+        } else {
+            lastPage = pageContent.keySet().stream().max(Integer::compareTo).orElse(1);
+        }
 
         if (isFull(lastPage)) {
-            List<ItemStack> items = new ArrayList<>();
-            items.add(itemStack);
-            BlackMarket.getInstance().getMarketPlaceInventory().pageContent()
-                    .put(lastPage + 1, items);
+            pageContent.put(lastPage + 1, new ArrayList<>(List.of(itemStack)));
         } else {
-            BlackMarket.getInstance().getMarketPlaceInventory().pageContent().get(lastPage)
-                    .add(itemStack);
+            pageContent.get(lastPage).add(itemStack);
         }
     }
 }

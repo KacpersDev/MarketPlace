@@ -2,12 +2,14 @@ package net.pulsir.blackMarket.gui;
 
 import net.kyori.adventure.text.Component;
 import net.pulsir.blackMarket.BlackMarket;
+import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,22 +32,36 @@ public interface Gui {
         inventory.setItem(BlackMarket.getInstance().getConfiguration()
                 .getConfiguration().getInt("previous.slot"), previousPage());
 
+        List<ItemStack> items = pageContent().get(0);
+
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+
+        if (type == GuiType.BLACK_MARKET) {
+            for (MarketPlaceItem marketPlaceItem : BlackMarket.getInstance().getBlackMarketManager().getBlackMarketItems().values()) {
+                items.add(marketPlaceItem.toItem());
+            }
+        }
+
         if (type.equals(GuiType.MARKETPLACE)) {
-            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("marketplace-inventory.market-slots");
+            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration()
+                    .getIntegerList("marketplace-inventory.market-slots");
             int currentItem = 0;
 
-            for (ItemStack itemStack : pageContent().get(0)) {
+            for (ItemStack itemStack : items) {
+                if (currentItem >= slots.size()) break;
                 inventory.setItem(slots.get(currentItem), itemStack);
-
                 currentItem++;
             }
         } else if (type.equals(GuiType.BLACK_MARKET)) {
-            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration().getIntegerList("blackmarket.slots");
+            List<Integer> slots = BlackMarket.getInstance().getConfiguration().getConfiguration()
+                    .getIntegerList("blackmarket.slots");
             int currentItem = 0;
 
-            for (ItemStack itemStack : pageContent().get(0)) {
+            for (ItemStack itemStack : items) {
+                if (currentItem >= slots.size()) break;
                 inventory.setItem(slots.get(currentItem), itemStack);
-
                 currentItem++;
             }
         }

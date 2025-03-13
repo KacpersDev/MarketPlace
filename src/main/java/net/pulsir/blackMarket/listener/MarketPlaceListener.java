@@ -6,6 +6,7 @@ import net.pulsir.blackMarket.BlackMarket;
 import net.pulsir.blackMarket.gui.GuiType;
 import net.pulsir.blackMarket.transaction.Transaction;
 import net.pulsir.blackMarket.utils.color.Color;
+import net.pulsir.blackMarket.utils.discord.DiscordWebhook;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.io.IOException;
 import java.util.*;
 
 public class MarketPlaceListener implements Listener {
@@ -41,16 +43,16 @@ public class MarketPlaceListener implements Listener {
         if (buttonEvent.equalsIgnoreCase("purchase")) {
             ItemStack itemStack = event.getCurrentItem();
 
-            if (!itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getSeller())
-            || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING) == null) return;
-            if (!itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getPrice())
-                    || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE) == null
-                    || !itemStack.getPersistentDataContainer().has(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING)
-                    || itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING) == null) return;
+            if (!itemStack.getItemMeta().getPersistentDataContainer().has(BlackMarket.getInstance().getSeller())
+            || itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING) == null) return;
+            if (!itemStack.getItemMeta().getPersistentDataContainer().has(BlackMarket.getInstance().getPrice())
+                    || itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE) == null
+                    || !itemStack.getItemMeta().getPersistentDataContainer().has(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING)
+                    || itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING) == null) return;
 
-            UUID seller = UUID.fromString(itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING));
-            UUID itemId = UUID.fromString(itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING));
-            double price = itemStack.getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE);
+            UUID seller = UUID.fromString(itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getSeller(), PersistentDataType.STRING));
+            UUID itemId = UUID.fromString(itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getItemId(), PersistentDataType.STRING));
+            double price = itemStack.getItemMeta().getPersistentDataContainer().get(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE);
 
             if (!BlackMarket.getEcon().has(player, price)) {
                 player.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
@@ -73,6 +75,20 @@ public class MarketPlaceListener implements Listener {
                 BlackMarket.getInstance().getTransactionManager().getTransactions().put(player.getUniqueId(), transactions);
             } else {
                 BlackMarket.getInstance().getTransactionManager().getTransactions().get(player.getUniqueId()).add(transaction);
+            }
+
+            DiscordWebhook discordWebhook = new DiscordWebhook(BlackMarket.getInstance().getConfiguration().getConfiguration().getString("webhook"));
+            DiscordWebhook.EmbedObject embedObject = new DiscordWebhook.EmbedObject();
+            embedObject.setAuthor(player.getName() + "s purchase", null, null);
+            embedObject.setTitle("Transaction Record");
+            embedObject.setDescription("Item: " + itemStack.getType() + "\nPrice:" + price);
+            embedObject.setFooter("Powered by Server.net", null);
+            embedObject.setColor(java.awt.Color.RED);
+            discordWebhook.addEmbed(embedObject);
+            try {
+                discordWebhook.execute();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
 
             player.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()

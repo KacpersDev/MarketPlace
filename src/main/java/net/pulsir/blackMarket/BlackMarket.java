@@ -8,6 +8,7 @@ import net.pulsir.blackMarket.command.SellCommand;
 import net.pulsir.blackMarket.command.TransactionCommand;
 import net.pulsir.blackMarket.gui.impl.BlackMarketInventory;
 import net.pulsir.blackMarket.gui.impl.MarketPlaceInventory;
+import net.pulsir.blackMarket.listener.BlackMarketListener;
 import net.pulsir.blackMarket.listener.MarketPlaceListener;
 import net.pulsir.blackMarket.marketplace.MarketPlaceItem;
 import net.pulsir.blackMarket.marketplace.MarketPlaceType;
@@ -17,6 +18,7 @@ import net.pulsir.blackMarket.mongo.MongoManager;
 import net.pulsir.blackMarket.task.BlackMarketTask;
 import net.pulsir.blackMarket.transaction.manager.TransactionManager;
 import net.pulsir.blackMarket.utils.config.Config;
+import net.pulsir.blackMarket.utils.discord.DiscordWebhook;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,6 +52,8 @@ public final class BlackMarket extends JavaPlugin {
 
     private MarketPlaceInventory marketPlaceInventory;
     private BlackMarketInventory blackMarketInventory;
+
+    private DiscordWebhook discordWebhook;
 
     @Override
     public void onEnable() {
@@ -86,6 +90,8 @@ public final class BlackMarket extends JavaPlugin {
             getBlackMarketManager().setCurrentTime(getConfiguration().getConfiguration()
                     .getLong("blackmarket-reset"));
         }
+
+        this.discordWebhook = new DiscordWebhook(getConfiguration().getConfiguration().getString("webhook"));
 
         this.loadMarket(MarketPlaceType.DEFAULT);
         this.loadMarket(MarketPlaceType.BLACK_MARKET);
@@ -124,6 +130,7 @@ public final class BlackMarket extends JavaPlugin {
 
     private void loadListeners(PluginManager pluginManager) {
         pluginManager.registerEvents(new MarketPlaceListener(), this);
+        pluginManager.registerEvents(new BlackMarketListener(), this);
     }
 
     private boolean setupEconomy() {

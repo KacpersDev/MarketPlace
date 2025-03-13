@@ -26,6 +26,32 @@ public class TransactionCommand implements CommandExecutor {
 
             if (args.length == 1) {
                 limit = 10;
+
+                if (!BlackMarket.getInstance().getTransactionManager().getTransactions().containsKey(offlinePlayer.getUniqueId())) {
+                    sender.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
+                            .getConfiguration().getString("transaction-empty-player").replace("{player}", args[0])));
+                    return false;
+                }
+
+                List<Transaction> transactions = BlackMarket.getInstance().getTransactionManager().getTransactionList(offlinePlayer.getUniqueId(), limit);
+
+                sender.sendMessage(Color.translate(BlackMarket.getInstance().getLanguage()
+                        .getConfiguration().getString("transaction-history")
+                        .replace("{amount}", String.valueOf(transactions.size()))
+                        .replace("{player}", offlinePlayer.getName())));
+
+                int i = 1;
+                for (Transaction transaction : transactions) {
+                    sender.sendMessage(Color.translate(BlackMarket.getInstance()
+                            .getLanguage().getConfiguration().getString("transaction-view")
+                            .replace("{index}", String.valueOf(i))
+                            .replace("{date}", String.valueOf(transaction.getTransactionDate()))
+                            .replace("{price}", String.valueOf(transaction.getPrice()))
+                            .replace("{item_name}", transaction.getTransactionItem().getItemMeta().getDisplayName())
+                            .replace("{item}", transaction.getTransactionItem().getType().name())
+                            .replace("{player}", offlinePlayer.getName())));
+                    i++;
+                }
             } else {
                 try {
                     limit = Integer.parseInt(args[1]);
