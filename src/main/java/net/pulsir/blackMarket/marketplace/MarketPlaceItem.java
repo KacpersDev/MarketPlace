@@ -35,9 +35,8 @@ public class MarketPlaceItem {
         itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getPrice(), PersistentDataType.DOUBLE, price);
         itemMeta.getPersistentDataContainer().set(BlackMarket.getInstance().getMarketPlaceInventory().buttonEvent(), PersistentDataType.STRING, "purchase");
         List<Component> lore = new ArrayList<>();
-        lore.add(Color.translate("<white>-------------------------------------").decoration(TextDecoration.ITALIC, false));
-        lore.add(Color.translate("<white>Price: <green>$" + price).decoration(TextDecoration.ITALIC, false));
-        lore.add(Color.translate("<white>-------------------------------------").decoration(TextDecoration.ITALIC, false));
+        BlackMarket.getInstance().getConfiguration().getConfiguration().getStringList("item-lore")
+                        .forEach(l -> lore.add(Color.translate(l.replace("{price}", String.valueOf(price))).decoration(TextDecoration.ITALIC, false)));
         itemMeta.lore(lore);
         marketIem.setItemMeta(itemMeta);
         return marketIem;

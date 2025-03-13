@@ -125,7 +125,7 @@ public final class BlackMarket extends JavaPlugin {
         Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand());
         Objects.requireNonNull(getCommand("marketplace")).setExecutor(new MarketPlaceCommand());
         Objects.requireNonNull(getCommand("blackmarket")).setExecutor(new BlackMarketCommand());
-        getCommand("transaction").setExecutor(new TransactionCommand());
+        Objects.requireNonNull(getCommand("transaction")).setExecutor(new TransactionCommand());
     }
 
     private void loadListeners(PluginManager pluginManager) {

@@ -78,11 +78,15 @@ public class BlackMarketListener implements Listener {
             DiscordWebhook discordWebhook = new DiscordWebhook(BlackMarket.getInstance().getConfiguration().getConfiguration().getString("webhook"));
             DiscordWebhook.EmbedObject embedObject = new DiscordWebhook.EmbedObject();
             embedObject.setAuthor(player.getName() + "s purchase", null, null);
-            embedObject.setTitle("Transaction Record");
-            embedObject.addField("Seller", player.getName(), false);
-            embedObject.addField("Item", itemStack.getType().name(), false);
-            embedObject.addField("Price", String.valueOf(price), false);
-            embedObject.setFooter("Powered by Server.net", null);
+            embedObject.setTitle(BlackMarket.getInstance().getConfiguration()
+                    .getConfiguration().getString("transaction-title"));
+            for (final String field : BlackMarket.getInstance().getConfiguration().getConfiguration().getStringList("transaction-fields")) {
+                embedObject.addField(field.split(":")[0],
+                        field.split(":")[1]
+                                .replace("{price}", String.valueOf(price))
+                                .replace("{item}", itemStack.getType().name())
+                                .replace("{seller}", player.getName()), false);
+            }
             embedObject.setColor(java.awt.Color.RED);
             discordWebhook.addEmbed(embedObject);
             try {

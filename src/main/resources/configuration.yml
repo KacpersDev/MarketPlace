@@ -29,6 +29,19 @@ permissions:
   marketplace-transactions: "marketplace.history"
   marketplace-blackmarket-refresh: "marketplace.blackmarket.refresh"
 
+item-lore:
+  - ""
+  - "&fPrice&7: &a$&a{price}"
+  - ""
+
+transaction-title: "MarketPlace Transaction"
+transaction-fields: # KEY:VALUE
+  - ""
+  - "Seller: {player}"
+  - "Price: {price}"
+  - "Item: {item}"
+  - ""
+
 # DO NOT DELETE
 
 blackmarket-reset: 0
